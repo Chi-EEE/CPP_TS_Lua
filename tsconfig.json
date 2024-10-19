@@ -7,7 +7,9 @@
             "ESNext"
         ],
         "moduleResolution": "Node",
-        "types": [],
+        "types": [
+            "lua-types/jit"
+        ],
         "strict": true
     },
     "tstl": {
