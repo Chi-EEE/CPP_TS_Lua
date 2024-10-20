@@ -15,7 +15,7 @@
     "tstl": {
         "luaTarget": "JIT",
         "luaBundle": "main.lua",
-        "luaBundleEntry": "scripts/main.ts",
+        "luaBundleEntry": "ts/scripts/main.ts",
         "noHeader": true,
     }
 }

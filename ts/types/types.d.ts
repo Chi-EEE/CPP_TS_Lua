@@ -1,4 +1,5 @@
-export namespace types {
+
+declare namespace types {
     export interface GameState {
         card_hand: CardHand;
         next_card: Card;
@@ -54,7 +55,7 @@ export namespace types {
     type RunCallback = (state: GameState) => ActionCard | void;
 
     /** @customConstructor cr.Bot.new */
-    export declare class Bot {
+    export class Bot {
         constructor();
         step(callback: RunCallback): void;
     }

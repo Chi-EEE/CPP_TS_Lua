@@ -1,6 +1,4 @@
-import { types } from "./types";
-
-function main() {
+function coroutine_main() {
     const coroutines = [
         coroutine.create(() => {
             const bot = new types.Bot();
@@ -45,6 +43,7 @@ function main() {
         for (const c of coroutines) {
             coroutine.resume(c)
         }
-    }
+    } 
 }
-main();
+
+coroutine_main();
