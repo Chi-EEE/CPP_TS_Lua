@@ -56,6 +56,6 @@ export namespace types {
     /** @customConstructor cr.Bot.new */
     export declare class Bot {
         constructor();
-        run(callback: RunCallback): void;
+        step(callback: RunCallback): void;
     }
 }

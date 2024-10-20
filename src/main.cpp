@@ -68,22 +68,26 @@ CPP_DUMP_DEFINE_EXPORT_OBJECT(ActionCard, card_name, tile_position);
 CPP_DUMP_DEFINE_EXPORT_OBJECT(Position, x, y);
 
 class Bot {
+	std::chrono::steady_clock::time_point last_run_time;
 public:
 	Bot() {
+		std::cout << "Bot has loaded" << std::endl;
 	}
 
-	void run(sol::this_state state, sol::function callback) {
-		std::cout << "Bot is running" << std::endl;
-		while (true) {
-			GameState game_state;
-			sol::table state_table = get_state_table(state, game_state);
-			const std::optional<ActionCard> maybe_action_card = parse_callback(callback.call(sol::nil, state_table));
-			if (!maybe_action_card.has_value()) {
-				return;
-			}
-			cpp_dump(maybe_action_card.value());
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	void step(sol::this_state state, sol::function callback) {
+		auto now = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_run_time);
+		if (elapsed.count() < 100) {
+			return;
 		}
+		last_run_time = now;
+		GameState game_state;
+		sol::table state_table = get_state_table(state, game_state);
+		const std::optional<ActionCard> maybe_action_card = parse_callback(callback.call(sol::nil, state_table));
+		if (!maybe_action_card.has_value()) {
+			return;
+		}
+		cpp_dump(maybe_action_card.value());
 	}
 
 private:
@@ -179,14 +183,16 @@ private:
 
 int main() {
 	auto main_lua = boost::dll::program_location().parent_path() / "main.lua";
-	
-	sol::state lua;
 
-	lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table);
+	sol::state lua;
+	lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table, sol::lib::coroutine);
+
 	auto bot = lua["cr"].get_or_create<sol::table>();
 	bot.new_usertype<Bot>("Bot",
-		"run", &Bot::run
+		"step", &Bot::step
 	);
+
 	lua.script_file(main_lua.string());
+
 	return 0;
 }
