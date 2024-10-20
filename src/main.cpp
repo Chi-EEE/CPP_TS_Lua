@@ -190,7 +190,6 @@ int main() {
 		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 		}
 	);
-	auto task = lua["task"].get_or_create<sol::table>();
 
 	auto bot = lua["cr"].get_or_create<sol::table>();
 	bot.new_usertype<Bot>("Bot",
