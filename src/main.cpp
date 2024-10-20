@@ -68,19 +68,12 @@ CPP_DUMP_DEFINE_EXPORT_OBJECT(ActionCard, card_name, tile_position);
 CPP_DUMP_DEFINE_EXPORT_OBJECT(Position, x, y);
 
 class Bot {
-	std::chrono::steady_clock::time_point last_run_time;
 public:
 	Bot() {
 		std::cout << "Bot has loaded" << std::endl;
 	}
 
 	void step(sol::this_state state, sol::function callback) {
-		auto now = std::chrono::steady_clock::now();
-		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_run_time);
-		if (elapsed.count() < 100) {
-			return;
-		}
-		last_run_time = now;
 		GameState game_state;
 		sol::table state_table = get_state_table(state, game_state);
 		const std::optional<ActionCard> maybe_action_card = parse_callback(callback.call(sol::nil, state_table));
@@ -186,6 +179,10 @@ int main() {
 
 	sol::state lua;
 	lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table, sol::lib::coroutine);
+	lua.set_function("tick", []() {
+		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		}
+	);
 
 	auto bot = lua["cr"].get_or_create<sol::table>();
 	bot.new_usertype<Bot>("Bot",
