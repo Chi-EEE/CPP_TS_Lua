@@ -68,12 +68,19 @@ CPP_DUMP_DEFINE_EXPORT_OBJECT(ActionCard, card_name, tile_position);
 CPP_DUMP_DEFINE_EXPORT_OBJECT(Position, x, y);
 
 class Bot {
+	std::chrono::steady_clock::time_point last_run_time;
 public:
 	Bot() {
 		std::cout << "Bot has loaded" << std::endl;
 	}
 
 	void step(sol::this_state state, sol::function callback) {
+		auto now = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_run_time);
+		if (elapsed.count() < 10) {
+			return;
+		}
+		last_run_time = now;
 		GameState game_state;
 		sol::table state_table = get_state_table(state, game_state);
 		const std::optional<ActionCard> maybe_action_card = parse_callback(callback.call(sol::nil, state_table));
